@@ -1,0 +1,13 @@
+coffee-mug
+
+inspired by coffeeKup
+Templates are actual coffeescript functions.
+This one avoids all the "magic" ( converting template function to string, adding code, compiling back to function ).
+
+All of the html tag functions are attached to the "this" object, so in coffeescript the tags become : @html, @head, @h1, etc.
+The data is passed explicitly to the template function, so it is named whatever the template names it.
+In fact, a template could easily require more than one "data" object -- they are simply the parameters to the template function.
+
+Most of the ideas ( and some of the code ) are borrowed from coffeeKup/coffeeCup
+The big difference here is that the html tag functions are not injected by "magic", they are passed as the "this" object to the template function.
+

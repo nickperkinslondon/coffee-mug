@@ -1,28 +1,32 @@
 coffeemug = require './coffeemug'
-person_page = require './person_page'
 
-person =
-  name:'Nick'
-  age:43
-  numbers:[1234567,98765432]
-  kids:[{
-    name:'Annabelle'
-    age:19
-  },{
-    name:'Spencer'
-    age:16
-  }]
+project_page_template = require './project_page'
 
+data_for_template =
+  name:'coffee-mug'
+  author:'nickperkinslondon'
+  email:'nickperkinslondon@gmail.com'
+  location:'London, Ontario, Canada'
+  url:'https://github.com/nickperkinslondon/coffee-mug'
+  description:"coffee-mug is a pure CoffeeScript HTML generator for node.js inspired by coffeekup"
+  features:[
+    'no magic'
+    'pure coffeescript'
+    'nice output'
+    'one language to rule them all'
+    'nice stacktrace on template errors'
+  ]
 
-http = require 'http'
-srv = http.createServer (req, res)->
-  res.writeHead 200, 'Content-Type': 'text/html'
-
-  html = coffeemug.render person, person_page
-
-  console.log html
-  res.end html
+html = coffeemug.render data_for_template, project_page_template
+console.log html
 
 
-srv.listen(1337, '127.0.0.1')
-console.log '---------Server running at http://127.0.0.1:1337/'
+serve_page = ()->
+  http = require 'http'
+  srv = http.createServer (req, res)->
+    res.writeHead 200, 'Content-Type': 'text/html'
+    res.end html
+  srv.listen(1337, '127.0.0.1')
+  console.log '---------Server running at http://127.0.0.1:1337/'
+
+serve_page()
