@@ -1,0 +1,751 @@
+<html>
+  <!-- This HTML generated with Coffee-Mug -->
+  <head>
+    <style>
+      body{
+        max-width: 960px;
+        font-family:Arial;
+        margin:0 auto;
+        padding:50px;
+      }
+      pre{
+        font-family:Lucida Console,Monaco,Consolas,Menlo,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,monospace;
+        padding:10px;
+      }
+      pre.coffeescript{
+        background:wheat;
+        font-weight:bold;
+      }
+      pre.args{
+        background:lightblue;
+      }
+      pre.html{
+        background:aquamarine;
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <h1> Coffee-Mug </h1>
+        <h2> HTML Templating with CoffeeScript </h2>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <pre class="coffeescript">@html ->
+  @body ->
+    @h1 'Coffeemug'</pre>
+          <a href="https://github.com/nickperkinslondon/coffee-mug"> github </a>
+          <br/>
+          <br/>
+          <p> Coffee-Mug is an alternative to conventional HTML templating in Javascript/Coffeescript.
+It is both powerful and dangerous ( for the same reason ): templates are written in Coffeescript,
+and are executed ( more-or-less ) directly. This gives the template writer
+unlimited power to do loops, conditionals, functions,...anything. </p>
+          <p> Of course, with great power comes great responsibility.
+If you are looking for a "sandboxed" template engine...this is not it. </p>
+          <p> Templates can be used in 2 ways: </p>
+          <p></p>
+          <p></p>
+          <p> 1) Template as a string: This is like conventional templating
+-- the template is stored as text, probably in a file.
+Coffeemug will compile the template using the Coffeescript compiler.
+The resulting function will be then be called to generate the HTML. </p>
+          <p> 2) Template as a function.  The template is actual code.
+The template function retains whatever closure it had when declared.
+In this mode, Coffeemug isn't really a "template engine" at all -- it's just a fast HTML generation library. </p>
+          <p> For example, here is a simple server for Node.js, where the "template"
+is defined on-the-spot as an anonymous function: </p>
+          <pre class="coffeescript">http = require &#039;http&#039;
+coffeemug = require &#039;./coffeemug&#039;
+
+srv = http.createServer (req,res)-&gt;
+  res.end coffeemug.render -&gt;
+
+    @html -&gt;
+      @head -&gt;
+        @style &quot;&quot;&quot;
+          body{
+            font-family:Arial;
+          }
+        &quot;&quot;&quot;
+      @body -&gt;
+        @h1 &#039;CoffeeMug&#039;
+        @h2 &#039;Write HTML with Coffeescript&#039;
+
+srv.listen 8001,&#039;0.0.0.0&#039;
+</pre>
+          <p> The above code is in 'example_server.coffee', and you can run it </p>
+          <p> The following examples are the actual test suite for the package: </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> Templates are pure Coffeescript, so indentation is significant: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">@html -&gt;
+  @body -&gt;
+    @h1 &#039;Coffeemug&#039;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;html&gt;
+  &lt;body&gt;
+    &lt;h1&gt; Coffeemug &lt;/h1&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> ...but you can do stuff on one line: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">@html -&gt; @body -&gt; @h1 &#039;Coffeemug&#039;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;html&gt;
+  &lt;body&gt;
+    &lt;h1&gt; Coffeemug &lt;/h1&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> Tag attributes are easy: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">@html -&gt;
+  @body -&gt;
+    @div
+      id:&#039;the-div&#039;
+      class:&#039;regular&#039;
+      style:&#039;border:1px solid black&#039;</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;html&gt;
+  &lt;body&gt;
+    &lt;div id=&quot;the-div&quot; class=&quot;regular&quot; style=&quot;border:1px solid black&quot;&gt;&lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> Tag attributes plus content: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">@html -&gt;
+  @body -&gt;
+    @div
+      id:&#039;the-div&#039;
+      class:&#039;regular&#039;
+      style:&#039;border:1px solid black&#039;
+      -&gt;
+        @h1 &#039;Coffeemug&#039;</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;html&gt;
+  &lt;body&gt;
+    &lt;div id=&quot;the-div&quot; class=&quot;regular&quot; style=&quot;border:1px solid black&quot;&gt;
+      &lt;h1&gt; Coffeemug &lt;/h1&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> Scripts are converted to Javascript: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">@html -&gt;
+  @head -&gt;
+    @script -&gt;
+      square = (x) -&gt; x * x
+      n = square 3
+      alert &quot;the number is: #{n}&quot;</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;html&gt;
+  &lt;head&gt;
+    &lt;script&gt;(function () {
+              var n, square;
+              square = function(x) {
+                return x * x;
+              };
+              n = square(3);
+              return alert(&quot;the number is: &quot; + n);
+            })();
+    &lt;/script&gt;
+  &lt;/head&gt;
+&lt;/html&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> Template can take an argument: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">(title)-&gt;
+  @html -&gt;
+    @head -&gt;
+    @body -&gt;
+      @h1 title
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Arguments: </td>
+        <td>
+          <pre class="args">[ 'Coffeemug' ]</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;html&gt;
+  &lt;head&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt; Coffeemug &lt;/h1&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> Template with two arguments: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">(title,subtitle)-&gt;
+  @html -&gt;
+    @head -&gt;
+    @body -&gt;
+      @h1 title
+      @h2 subtitle</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Arguments: </td>
+        <td>
+          <pre class="args">[ 'CoffeeMug', 'the anti-template' ]</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;html&gt;
+  &lt;head&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt; CoffeeMug &lt;/h1&gt;
+    &lt;h2&gt; the anti-template &lt;/h2&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> Template with any number of (...) arguments: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">
+(things...)-&gt;
+  @html -&gt;
+    @body -&gt;
+      @ul -&gt;
+        for thing in things
+          @li thing</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Arguments: </td>
+        <td>
+          <pre class="args">[ 'one', 'two', 'three' ]</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;html&gt;
+  &lt;body&gt;
+    &lt;ul&gt;
+      &lt;li&gt; one &lt;/li&gt;
+      &lt;li&gt; two &lt;/li&gt;
+      &lt;li&gt; three &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> Argument can be an object: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">
+(data)-&gt;
+  @html -&gt;
+    @body -&gt;
+      @h1 data.title
+      @h2 data.subtitle</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Arguments: </td>
+        <td>
+          <pre class="args">[ { title: 'CoffeeMug',
+    subtitle: 'pure coffeescript html templating' } ]</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;html&gt;
+  &lt;body&gt;
+    &lt;h1&gt; CoffeeMug &lt;/h1&gt;
+    &lt;h2&gt; pure coffeescript html templating &lt;/h2&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> Argument object could be helper functions: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">(helpers)-&gt;
+  @html -&gt;
+    @body -&gt;
+      @h1 helpers.capitalize &#039;coffeemug&#039;
+      @h2 helpers.format_money 0</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Arguments: </td>
+        <td>
+          <pre class="args">[ { format_money: [Function], capitalize: [Function] } ]</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;html&gt;
+  &lt;body&gt;
+    &lt;h1&gt; Coffeemug &lt;/h1&gt;
+    &lt;h2&gt; $0 &lt;/h2&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> Templates may define local functions and call them with args: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">(name,address)-&gt;
+  make_title=(s)-&gt;
+    @h1 s
+  make_subtitle=(s)-&gt;
+    @h2 s
+  @html -&gt;
+    @body -&gt;
+      @call make_title, name
+      @call make_subtitle, address</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Arguments: </td>
+        <td>
+          <pre class="args">[ 'Nick', 'Canada' ]</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;html&gt;
+  &lt;body&gt;
+    &lt;h1&gt; Nick &lt;/h1&gt;
+    &lt;h2&gt; Canada &lt;/h2&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> comments: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">@html -&gt;
+  @head -&gt;
+    @comment &quot;This is a comment&quot;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;html&gt;
+  &lt;head&gt;
+    &lt;!-- This is a comment --&gt;
+  &lt;/head&gt;
+&lt;/html&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> nothing is nothing: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript"></pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html"></pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> text: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">@text &quot;abc&quot;</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">abc</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> doctype: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">@doctype &#039;html&#039;
+@html -&gt;
+  @body -&gt;</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;body&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> escaping: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">@pre @escape &quot;&lt;h1&gt;&quot;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;pre&gt;&amp;lt;h1&amp;gt;&lt;/pre&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> invalid code: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">fds fds fds</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">ReferenceError: fds is not defined</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+    </table>
+  </body>
+  <p> This page itself is generated with Coffee-Mug, by "generate_docs.coffee" </p>
+</html>
