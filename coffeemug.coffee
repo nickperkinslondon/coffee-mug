@@ -1,123 +1,388 @@
-buffer = []
-indent = 0
-at_start = true # at beginning of a line
+#
+# coffeemug.coffee
+# by Nick Perkins, May 2012
+#
 
-leading_space = ()->
-  Array(indent+1).join '  '
+coffeescript = require 'coffee-script'
+expect = require 'expect.js'
 
-write = (s)->
-  buffer.push s
-  at_start = false
-write_line = (s)->
-  if not at_start
-    write '\n'
-  write leading_space() + s + '\n'
-  at_start = true
-start_line = (s)->
-  if not at_start
-    write '\n'
-  write leading_space() + s
-  at_start = false
-end_line = (s)->
-  write s + '\n'
-  at_start = true
+say = console.log
+
+html_tags = """ a abbr address article aside audio b bdi bdo blockquote
+body button canvas caption cite code colgroup datalist dd del details
+dfn div dl dt em fieldset figcaption figure footer form h1 h2 h3 h4 h5 h6
+head header hgroup html i iframe ins kbd label legend li map mark menu
+meter nav noscript object ol optgroup option output p pre progress q rp
+rt ruby s samp script section select small span strong style sub summary
+sup table tbody td textarea tfoot th thead time title tr u ul video """
+
+self_closing_tags = """ area base br col command embed hr img
+inputkeygen link meta param source track wbr """
 
 trim = (s)->s.replace /^\s+|\s+$/g, ''
 
-tags = """ a abbr address article aside audio b bdi bdo
-blockquote body button canvas caption cite code colgroup
-datalist dd del details dfn div dl dt em fieldset figcaption
-figure footer form h1 h2 h3 h4 h5 h6 head header hgroup html
-i iframe ins kbd label legend li map mark menu meter nav
-noscript object ol optgroup option output p pre progress q rp
-rt ruby s samp script section select small span strong style
-sub summary sup table tbody td textarea tfoot th thead time
-title tr u ul video """
+compile_coffeescript = ( cs_code, debug = false )->
+  #
+  # Templates passed as strings must be compiled,
+  # ( so they will not retain any closure )
+  #
+  # Templates passed directly as functions do keep closure.
+  #
+  try
+    js_code = coffeescript.compile( cs_code, bare:true )
+    if debug
+      console.log 'CS COMPILED TO:'
+      console.log '\n'+js_code
+  catch ex
+    #
+    # Template Compile Error : invalid Coffeescript in template!
+    # ( or maybe you forgot to pass the template
+    #   as the last arg to "render"? )
+    #
+    msg = []
+    msg.push "Compiling Coffeemug Template"
+    msg.push ex.toString()
+    for line in cs_code.split '\n'
+      msg.push line
+    s = msg.join '\n'
+    throw new Error s
 
-self_closing_tags = """ area base br col command embed hr
-img inputkeygen link meta param source track wbr """
-
-write_attrs = (attrs)->
-  for k, v of attrs
-    switch typeof v
-      when 'boolean'
-        if v
-          v = k # `true` is rendered as `selected="selected"`.
-      when 'function'
-        v = v.apply(this) #?
-      else
-        v = v
-    write " #{k}=\"#{v}\""
+  #
+  # Ok, the coffeescript is compiled into javascript...
+  # ...now we check what we got...maybe tweak it....
+  #
 
 
-make_tag = (tagname)->
-  closetag = "</#{tagname}>"
-  (args...)->
-    # (content) or (attrs,content) ?
-    for a in args
-      switch typeof a
-        when 'object'
-          attrs = a
-        when 'function'
-          content_fn = a
+  # if the template argument is a splat:
+  # (args...)->
+  #   @body
+  # ...then we have a problem because coffeescript
+  # compiles it to code that is not just a function declaration,
+  #  but also includes :
+  #
+  # var __slice = [].client;
+  # (function() {
+  #    var args;
+  #    args = 1 <= arguments.length? __slice.call(arguments,0) : [];
+  #    ...
+  # })
+  #
+  # So....what can we do about this?
+  # We need it to compile down to just a function!
+  #
+  if js_code.substring(0,11) is 'var __slice'
+    js_code = js_code.replace 'var __slice = [].slice;\n', ''
+    js_code = js_code.replace '__slice.call', '([].slice).call'
+
+
+  # If the template declares arugments, then it will
+  #  have compiled into a javascript function declaration,
+  #  but if the template does not specify arguments, then it
+  #  will have compiled into just a series of js statements,
+  #  and we need to wrap it in a function:
+  #
+  if js_code.substring(0,11) isnt '\n(function('
+    js_code = '(function(){'+js_code+'})'
+    if debug
+      console.log 'WRAPPED:'
+      console.log js_code
+
+
+  # compile the generated javascript into a function:
+  f = eval( js_code )
+
+  expect(f).to.be.a('function')
+
+
+  # evil? no
+  # dangerous? YES! -- Templates can execute ANY code!
+  #                    So you must trust your templates.
+  #                    If you can't trust your templates, use something else
+  return f
+
+
+
+#
+# a "mug" object does the rendering,
+#  and keeps state ( like "buffer", and current indent level )
+#
+renderer = ->
+  #
+  # constrcutor function:
+  #  local vars will be private ( in closure )
+  #  returned value ( API ) will be public
+  #
+  buffer = []     # list of strings to be concatenated
+  indent = 0      # current indentation level
+  at_start = true # are we currently at beginning of a line?
+
+  debug = false   # debug mode: output stuff to console
+
+
+  # function "write" and friends, help to write HTML to the buffer
+  # and keep track of indentation etc...
+
+  write = (s)->
+    # no new line, no indentation, just write text
+    buffer.push s
+    at_start = false
+
+  write_line = (s)->
+    # write a new line, indented, and end the line
+    if not at_start
+      write '\n'
+    write leading_space() + s + '\n'
+    at_start = true
+
+  start_line = (s)->
+    # start a new indented line, but don't end the line yet
+    if not at_start
+      write '\n'
+    write leading_space() + s
+    at_start = false
+
+  end_line = (s)->
+      # continue the current line, write stuff, then end the line
+      write s + '\n'
+      at_start = true
+
+  leading_space = ->
+    # return a string of spaces for indentation
+    Array(indent+1).join '  '
+
+  write_attrs = (attrs)->
+    # write out TAG Attributes ( within the opening tag )
+    for k, v of attrs
+      switch typeof v
+        when 'boolean'
+          if v
+            v = k # true is rendered as 'selected="selected"' ( thanks coffeekup )
         else
-          content = a
+          v = v
+      write " #{k}=\"#{v}\""
 
-    start_line "<"+tagname
-    if attrs
-      write_attrs attrs
-    write ">"
 
-    if content
-      write " #{content} "
-      end_line closetag
+  #
+  # make_tag:
+  #  Given a tagname, like 'h1', create and return a function
+  #   that writes that tag to the buffer,  like "<h1>....</h1>"
+  #  The created function also takes aguments to write the stuff in-between
+  #
+  make_tag = (tagname)->
+    closetag = "</#{tagname}>"
+    (args...)->
+      #
+      # tag args can be in any order, and are identified by type:
+      #  a 'function' is indented multi-line content
+      #  an 'object' is a set of tag attributes
+      #  anything else is direct content for a one-liner
+      #
+      for a in args
+        switch typeof a
+          when 'object'
+            attrs = a
+          when 'function'
+            content_fn = a
+          else
+            content = a
 
-    if content_fn
-      indent += 1
-      content_fn.apply(this)
-      indent -= 1
-      write_line closetag
+      start_line "<"+tagname
+      if attrs
+        write_attrs attrs
+      write ">"
 
-make_self_closing_tag = (tagname)->
-  return (attrs)->
-    start_line "<"+tagname
-    if typeof attrs is 'object'
-      write_attrs attrs
-    end_line "/>"
+      if content
+        if tagname == 'pre'
+          write "#{content}" # don't add spaces
+        else
+          write " #{content} " # add space for readability
+        end_line closetag
+      else
+        if content_fn
+          indent += 1
+          content_fn.apply(this)
+          indent -= 1
+          write_line closetag
+        else
+          end_line closetag
 
-html = {} # this object will become "this" for template functions
 
-for line in tags.split '\n'
-  for tagname in line.split(' ')
-    html[tagname] = make_tag tagname
+  #
+  # a self-closing tag, like <img src='kitten.jpg' alt='Kitten'>
+  #  has attributes, but no content,
+  #  and no closing tag
+  #
+  make_self_closing_tag = (tagname)->
+    return (attrs)->
+      start_line "<"+tagname
+      if typeof attrs is 'object'
+        write_attrs attrs
+      end_line "/>"
 
-for line in self_closing_tags.split '\n'
-  for tagname in line.split ' '
-    html[tagname] = make_self_closing_tag tagname
 
-html.text = (s)->write s
+  #
+  # The "template_this" object
+  #  will become the "this" for template functions.
+  #
+  # This is how we magically pass all of the "@" functions
+  #  into the template.
+  #
+  # We will attach a "tag function" for each tag to the "template_this" object.
+  # The template can then call these using the coffeescript "@" operator:
+  #
+  # @html ->
+  #   @body ->
+  #     @h1 "Hello, World"
+  #
 
-html.script = (f)->
-  if typeof f is 'function'
-    js = trim f.toString()
-    start_line "<script>("
-    for line in js.split '\n'
-      end_line line
-    write_line ")()</script>"
+  template_this = {}
 
-html.style = (s)->
-  if typeof s is 'string'
-    write_line '<style>'
-    indent +=1
-    for line in s.split '\n'
-      write_line line
-    indent -=1
-    write_line '</style>'
+  #
+  # create attach all regular TAG functions:
+  #
+  for line in html_tags.split '\n'
+    for tagname in line.split(' ')
+      template_this[tagname] = make_tag tagname
 
-html.doctype = (x)->
-  write_line "<!DOCTYPE #{x}>"
+  #
+  # create and attach all Self-Closing TAG function:
+  #
+  for line in self_closing_tags.split '\n'
+    for tagname in line.split ' '
+      template_this[tagname] = make_self_closing_tag tagname
 
-exports.render = (data,template) ->
-  buffer = []
-  template.call(html, data)
-  buffer.join ''
+
+  #
+  # Special TAGs: text, script, style, doctype, etc.
+  # Each of these works a bit differently from a standard tag,
+  #  so they are defined separately:
+  #
+  template_this.text = (s)->
+    # not a tag, just writes text directly to the buffer
+    write s
+
+  template_this.script = (f)->
+    # content is a function ( written in coffeescript )
+    # we convert it to javascript and put it in a <script> tag:
+    if typeof f is 'function'
+      #
+      # argument is a function
+      #  we "toString" it which creates "function(){...}",
+      #   then add "()" to call the function immediately.
+      #  so we end up with a closure,
+      #   and the script cannot create global vars
+      #
+      js = trim f.toString()
+      start_line "<script>("
+      lines = js.split '\n'
+      end_line lines[0]
+      indent += 2
+      for line in lines[1..]
+        start_line line
+      indent -= 2
+      end_line ")();"
+      write_line "</script>"
+
+    if typeof f is 'object'
+      start_line '<script'
+      write_attrs f
+      end_line '></script>'
+
+  template_this.style = (s)->
+    # style takes a mult-line string ( of CSS )
+    # we make sure to indent the whole block of text:
+    if typeof s is 'string'
+      write_line '<style>'
+      indent +=1
+      for line in s.split '\n'
+        write_line line
+      indent -=1
+      write_line '</style>'
+
+  template_this.doctype = (x)->
+    write_line "<!DOCTYPE #{x}>"
+
+  template_this.call = (fn,args...)->
+    #
+    # Templates can "call" other templates
+    # We have to "apply" the function to our "template_this"
+    #  so that it writes to our buffer, and uses our indentation level, etc
+    #
+    if typeof fn is 'function'
+      fn.apply(template_this,args)
+    else
+      throw new Error 'call takes a function as first arg'
+
+  template_this.comment = (s)->
+    write_line "<!-- "+s+" -->"
+
+  template_this.escape = (text)->
+    text.replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;')
+
+  #
+  # OK, all that was internal...now here's the public API:
+  #
+  API = {}
+
+  API.set_debug = (b)->
+    debug = b
+
+  API.render = (args...,template) ->
+    #
+    # any number of args
+    #  last arg is the template ( function or string )
+    #  other args are passed to the template function
+    #
+    if typeof template is 'function'
+      # ok, good
+    else
+      if typeof template is 'string'
+        template = compile_coffeescript( template, debug )
+        # throws if any error
+      else
+        throw new Error 'template must be a function or a string'
+
+
+    expect(args).to.be.an('array') # might be empty
+    expect(template).to.be.a('function') # was compiled if string
+    #
+    # Rendering the template is imply calling the template function,
+    #  while setting the "this" object to the "template_this" object.
+    #
+    # The buffer is already in the closure
+    #  of all of the "template_this" functions, so
+    #  the same buffer is used for the entire rendering.
+    #
+    buffer = []
+    template.apply(template_this,args)
+    renedered_html = buffer.join ''
+    return renedered_html
+
+  return API
+
+
+#exports.renderer = renderer
+
+exports.render = (args...)->
+    r = renderer()
+    try
+      html = r.render.apply(r,args)
+    catch e
+      html = e.toString()
+    return html
+
+
+#
+# Two ways to use:
+#
+# 1) the simple way: coffeemug.render( args..., template )
+#
+# 2) an explicit "renderer":
+#      renderer = coffeemug.renderer()
+#      html = renderer.render( args..., template )
+#      # Method #2 allows you to have multiple "mugs"
+#      # that don't interfere with each other.
