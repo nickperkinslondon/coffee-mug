@@ -56,7 +56,8 @@ The template function retains whatever closure it had when declared.
 In this mode, Coffeemug isn't really a "template engine" at all -- it's just a fast HTML generation library. </p>
           <p> For example, here is a simple server for Node.js, where the "template"
 is defined on-the-spot as an anonymous function: </p>
-          <pre class="coffeescript">http = require &#039;http&#039;
+          <pre class="coffeescript">
+http = require &#039;http&#039;
 coffeemug = require &#039;./coffeemug&#039;
 
 srv = http.createServer (req,res)-&gt;
@@ -74,6 +75,7 @@ srv = http.createServer (req,res)-&gt;
         @h2 &#039;Write HTML with Coffeescript&#039;
 
 srv.listen 8001,&#039;0.0.0.0&#039;
+
 </pre>
           <p> The above code is in 'example_server.coffee', and you can run it </p>
           <p> The following examples are the actual test suite for the package: </p>
@@ -719,7 +721,37 @@ srv.listen 8001,&#039;0.0.0.0&#039;
       </tr>
       <tr>
         <td colspan="9">
-          <h3> invalid code: </h3>
+          <h3> invalid coffeescript: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">123abc***</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">Error: Compiling Coffeemug Template
+Error: Parse error on line 1: Unexpected &#039;IDENTIFIER&#039;
+123abc***</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> run-time exception: </h3>
         </td>
       </tr>
       <tr>
@@ -745,7 +777,71 @@ srv.listen 8001,&#039;0.0.0.0&#039;
           <hr/>
         </td>
       </tr>
+      <tr>
+        <td colspan="9">
+          <h3> typical anchor: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">@a href:&quot;www.google.com&quot;, &quot;Google&quot;</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;a href=&quot;www.google.com&quot;&gt; Google &lt;/a&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <h3> attributes plus function content: </h3>
+        </td>
+      </tr>
+      <tr>
+        <td> Coffeemug Template: </td>
+        <td>
+          <pre class="coffeescript">@a href:&quot;www.google.com&quot;, -&gt;
+  @h3 &quot;Google&quot;</pre>
+        </td>
+      </tr>
+      <tr>
+        <td> Rendered HTML: </td>
+        <td>
+          <pre class="html">&lt;a href=&quot;www.google.com&quot;&gt;
+  &lt;h3&gt; Google &lt;/h3&gt;
+&lt;/a&gt;
+</pre>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p>
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="9">
+          <hr/>
+        </td>
+      </tr>
     </table>
   </body>
-  <p> This page itself is generated with Coffee-Mug, by "generate_docs.coffee" </p>
+  <p>This page itself is generated with Coffee-Mug, by 
+    <a href="https://github.com/nickperkinslondon/coffee-mug/blob/master/generate_docs.coffee">generate_docs.coffee
+    </a>
+  </p>
 </html>

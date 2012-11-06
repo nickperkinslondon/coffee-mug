@@ -415,8 +415,46 @@ tests.push
 
 #-----------------------------------------------------------------------------
 tests.push
-  description    : 'invalid code'
+  description    : 'invalid coffeescript'
+  template       : """
+    123abc***
+  """
+  expected_html : """
+    Error: Compiling Coffeemug Template
+    Error: Parse error on line 1: Unexpected 'IDENTIFIER'
+    123abc***"""
+
+
+#-----------------------------------------------------------------------------
+tests.push
+  description    : 'run-time exception'
   template       : """
     fds fds fds
   """
   expected_html : "ReferenceError: fds is not defined"
+
+
+#-----------------------------------------------------------------------------
+tests.push
+  description    : 'typical anchor'
+  template       : """
+    @a href:"www.google.com", "Google"
+  """
+  expected_html : """
+    <a href="www.google.com"> Google </a>
+
+    """
+
+#-----------------------------------------------------------------------------
+tests.push
+  description    : 'attributes plus function content'
+  template       : """
+    @a href:"www.google.com", ->
+      @h3 "Google"
+  """
+  expected_html : """
+    <a href="www.google.com">
+      <h3> Google </h3>
+    </a>
+
+    """

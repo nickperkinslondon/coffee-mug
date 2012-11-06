@@ -17,7 +17,7 @@ rt ruby s samp script section select small span strong style sub summary
 sup table tbody td textarea tfoot th thead time title tr u ul video """
 
 self_closing_tags = """ area base br col command embed hr img
-inputkeygen link meta param source track wbr """
+input keygen link meta param source track wbr """
 
 trim = (s)->s.replace /^\s+|\s+$/g, ''
 
@@ -92,19 +92,13 @@ compile_coffeescript = ( cs_code, debug = false )->
   f = eval( js_code )
 
   expect(f).to.be.a('function')
-
-
-  # evil? no
-  # dangerous? YES! -- Templates can execute ANY code!
-  #                    So you must trust your templates.
-  #                    If you can't trust your templates, use something else
   return f
 
 
 
 #
-# a "mug" object does the rendering,
-#  and keeps state ( like "buffer", and current indent level )
+# a "renderer" object does the rendering,
+#  and keeps state ( like "buffer", and current indentation level )
 #
 renderer = ->
   #
@@ -365,7 +359,6 @@ renderer = ->
   return API
 
 
-#exports.renderer = renderer
 
 exports.render = (args...)->
     r = renderer()

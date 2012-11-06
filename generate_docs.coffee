@@ -160,9 +160,10 @@ generate_docs = (callback)->
                       @pre -> @span style:'color:red;', ("FAIL! expected: \n"+escape(actual_html))
             @tr -> @td colspan:9, -> @hr()
 
-      @p '''
-      This page itself is generated with Coffee-Mug, by "generate_docs.coffee"
-      '''
+      @p ->
+        @text "This page itself is generated with Coffee-Mug, by "
+        @a href:"https://github.com/nickperkinslondon/coffee-mug/blob/master/generate_docs.coffee", ->
+          @text "generate_docs.coffee"
 
   html = coffeemug.render docs_template
 

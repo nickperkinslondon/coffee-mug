@@ -8,7 +8,7 @@
   "respository":{
       "type":"git",
       "url":"git://github.com/nickperkinslondon/coffee-mug.git"
-  }
+  },
   "devDependencies":{
     "coffee-script":">=1.3",
     "expect.js":">=0.1.2"

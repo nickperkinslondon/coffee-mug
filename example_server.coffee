@@ -1,3 +1,4 @@
+
 http = require 'http'
 coffeemug = require './coffeemug'
 
@@ -16,3 +17,4 @@ srv = http.createServer (req,res)->
         @h2 'Write HTML with Coffeescript'
 
 srv.listen 8001,'0.0.0.0'
+
