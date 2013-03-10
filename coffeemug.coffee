@@ -3,8 +3,30 @@
 # by Nick Perkins, May 2012
 #
 
-coffeescript = require 'coffee-script'
-expect = require 'expect.js'
+
+#
+# client or server?
+# are we in a browser? or in Node.js ?
+#
+
+server = false
+if typeof exports != 'undefined'
+  if typeof module != 'undefined' and module.exports
+    server = true # on Node.js or similar
+
+browser = not server
+
+if server
+  root = exports
+
+if browser
+  window.CoffeeMug = root = {}
+
+
+if server
+  coffeescript = require 'coffee-script'
+  expect = require 'expect.js'
+
 
 say = console.log
 
@@ -239,7 +261,7 @@ renderer = ->
       template_this[tagname] = make_tag tagname
 
   #
-  # create and attach all Self-Closing TAG function:
+  # create and attach all Self-Closing TAG functions:
   #
   for line in self_closing_tags.split '\n'
     for tagname in line.split ' '
@@ -317,6 +339,25 @@ renderer = ->
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#039;')
 
+
+
+  original_button_function = template_this.button
+  template_this.button = (text,atrs, fn)->
+    if not fn and typeof atrs is 'function' then fn = atrs
+    if fn and typeof fn is 'function'
+      code = ''+fn      
+      code = code.replace(/\n/g,'')
+      code = code.replace(/\r/g,'')
+      code = code.replace(/\t/g,' ')
+      start_line '<button'
+      if atrs
+        write_attrs atrs
+      end_line ' onclick="'+code+'()"> '+text+' </button>'
+    else
+      original_button_function text,atrs
+
+
+
   #
   # OK, all that was internal...now here's the public API:
   #
@@ -340,9 +381,11 @@ renderer = ->
       else
         throw new Error 'template must be a function or a string'
 
+    if server
+      expect(args).to.be.an('array') # might be empty
+      expect(template).to.be.a('function') # was compiled if string
 
-    expect(args).to.be.an('array') # might be empty
-    expect(template).to.be.a('function') # was compiled if string
+
     #
     # Rendering the template is imply calling the template function,
     #  while setting the "this" object to the "template_this" object.
@@ -360,7 +403,7 @@ renderer = ->
 
 
 
-exports.render = (args...)->
+root.render = (args...)->
     r = renderer()
     try
       html = r.render.apply(r,args)

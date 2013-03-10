@@ -458,3 +458,42 @@ tests.push
     </a>
 
     """
+
+
+#-----------------------------------------------------------------------------
+tests.push
+  description    : 'button functions!'
+  template       : """
+    @button "Click Me", ->
+      alert 'thank-you'
+  """
+  expected_html : """
+    <button onclick="function () {  return alert('thank-you');}()"> Click Me </button>
+
+    """
+
+
+
+#-----------------------------------------------------------------------------
+tests.push
+  description    : 'button functions with other attrs'
+  template       : """
+    @button "Click Me", id:'x', ->
+      alert 'thank-you'
+  """
+  expected_html : """
+    <button id="x" onclick="function () {  return alert('thank-you');}()"> Click Me </button>
+
+    """
+
+
+#-----------------------------------------------------------------------------
+tests.push
+  description    : 'button with no functions still works normally'
+  template       : """
+    @button "Click Me", id:'x'
+  """
+  expected_html : """
+    <button id="x"> Click Me </button>
+
+    """

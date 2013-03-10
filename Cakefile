@@ -26,7 +26,10 @@ test = (callback)->
   # run all tests, and only call the callback if they all pass
   #mocha_proc = child_process.spawn 'mocha' ,['--compilers','coffee:coffee-script','--colors','-R','list']
   say 'running tests...'
-  mocha_proc = child_process.spawn 'mocha' ,['--colors','-R','list']
+  
+  mocha_proc = child_process.spawn 'mocha' ,['--colors','-R','spec']
+  
+
   mocha_proc.stdout.pipe(process.stdout, end:false )
   mocha_proc.stderr.pipe(process.stderr, end:false )
   mocha_proc.on 'exit',(code)->
