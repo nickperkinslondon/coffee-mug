@@ -352,7 +352,7 @@ renderer = ->
       start_line '<button'
       if atrs
         write_attrs atrs
-      end_line ' onclick="'+code+'()"> '+text+' </button>'
+      end_line ' onclick="('+code+')()"> '+text+' </button>'
     else
       original_button_function text,atrs
 

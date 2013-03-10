@@ -468,7 +468,7 @@ tests.push
       alert 'thank-you'
   """
   expected_html : """
-    <button onclick="function () {  return alert('thank-you');}()"> Click Me </button>
+    <button onclick="(function () {  return alert('thank-you');})()"> Click Me </button>
 
     """
 
@@ -482,7 +482,7 @@ tests.push
       alert 'thank-you'
   """
   expected_html : """
-    <button id="x" onclick="function () {  return alert('thank-you');}()"> Click Me </button>
+    <button id="x" onclick="(function () {  return alert('thank-you');})()"> Click Me </button>
 
     """
 
