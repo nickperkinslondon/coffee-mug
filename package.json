@@ -1,7 +1,7 @@
 {
   "name":"coffee-mug",
   "description":"A Coffee-Script HTML Generator",
-  "version":"1.0",
+  "version":"1.0.0",
   "keywords":["coffeescript","html","javascript","template"],
   "author":"Nick Perkins",
   "homepage":"http://nickperkinslondon.github.com/coffee-mug/coffeemug_docs.html",
@@ -10,7 +10,7 @@
       "url":"git://github.com/nickperkinslondon/coffee-mug.git"
   },
   "devDependencies":{
-    "coffee-script":">=1.3",
+    "coffee-script":"*",
     "expect.js":">=0.1.2"
   }
 
